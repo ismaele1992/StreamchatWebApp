@@ -1,8 +1,8 @@
 const { MongoClient } = require('mongodb');
 
 class TwitchBadgeRepository {
-  constructor() {
-    this.client = new MongoClient('mongodb://localhost:27017');
+  constructor(uri = process.env.MONGO_URI || 'mongodb://localhost:27017') {
+    this.client = new MongoClient(uri);
     this.dbName = 'streamchat';
   }
 
