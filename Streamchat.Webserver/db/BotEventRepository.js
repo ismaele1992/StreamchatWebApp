@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
 
 class BotEventRepository {
-  constructor(uri = 'mongodb://localhost:27017', dbName = 'streamchat') {
+  constructor(uri = process.env.MONGO_URI || 'mongodb://localhost:27017', dbName = 'streamchat') {
     this.client = new MongoClient(uri);
     this.dbName = dbName;
   }
