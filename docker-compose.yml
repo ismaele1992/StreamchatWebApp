@@ -1,12 +1,15 @@
-webserver:
-  build:
-    context: ./Streamchat.Webserver
-  container_name: streamchat_webserver
-  restart: always
-  ports:
-    - "80:80"
-    - "443:443"
-  volumes:
-    - ./Streamchat.Webserver/app.config.json:/usr/src/app/app.config.json
-    - ./Streamchat.Webserver/unterstadistycs.sytes.net-chain.pem:/usr/src/app/unterstadistycs.sytes.net-chain.pem
-    - ./Streamchat.Webserver/unterstadistycs.sytes.net-key.pem:/usr/src/app/unterstadistycs.sytes.net-key.pem
+version: '3.8'
+
+services:
+  webserver:
+    build:
+      context: .
+    container_name: streamchat_webserver
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../sec/app.config.json:/usr/src/app/app.config.json
+      - ../sec/unterstadistycs.sytes.net-chain.pem:/usr/src/app/unterstadistycs.sytes.net-chain.pem
+      - ../sec/unterstadistycs.sytes.net-key.pem:/usr/src/app/unterstadistycs.sytes.net-key.pem

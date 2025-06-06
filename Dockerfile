@@ -1,5 +1,5 @@
 # Etapa 1: clonamos el repo
-FROM alpine/git as git-clone
+FROM alpine/git AS git-clone
 
 WORKDIR /src
 
@@ -7,7 +7,7 @@ WORKDIR /src
 RUN git clone --single-branch --branch master https://github.com/ismaele1992/StreamchatWebApp.git
 
 # Etapa 2: build del frontend
-FROM node:18 as frontend-build
+FROM node:18 AS frontend-build
 
 WORKDIR /app
 
