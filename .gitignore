@@ -36,3 +36,13 @@ build/
 # =====================================
 *.log
 logs/
+
+# =====================================
+# Security
+# =====================================
+KickToken.json
+TwitchToken.json
+app.config.json
+*.pem
+*.key
+*.crt
