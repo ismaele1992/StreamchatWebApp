@@ -1,8 +1,14 @@
 version: '3.8'
 
 services:
-  environment:
-  - MONGO_URI=mongodb://mongo:27017
+  mongo:
+      image: mongo:6.0
+      container_name: streamchat_mongo
+      restart: always
+      ports:
+        - "27017:27017"
+      volumes:
+        - mongo-data:/data/db
   webserver:
     build:
       context: .
@@ -11,7 +17,14 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "8081:8081"
+      - "8090:8090"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
     volumes:
       - ../sec/app.config.json:/usr/src/app/app.config.json
       - ../sec/unterstadistycs.sytes.net-chain.pem:/usr/src/app/unterstadistycs.sytes.net-chain.pem
       - ../sec/unterstadistycs.sytes.net-key.pem:/usr/src/app/unterstadistycs.sytes.net-key.pem
+
+volumes:
+  mongo-data:
