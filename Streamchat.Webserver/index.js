@@ -63,9 +63,9 @@ const PORT = 443;
 let cachedBadges = [];
 
 app.use(bodyParser.json());
-
-app.get('/', (_, res) => {
-    res.status(200).send('OK');
+app.use(express.static(path.join(__dirname, 'dist')));
+app.get(/^\/(?!api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 app.post('/api/kickwebhook', async(req, res) => {

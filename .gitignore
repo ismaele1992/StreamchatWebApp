@@ -43,6 +43,8 @@ logs/
 KickToken.json
 TwitchToken.json
 app.config.json
+client_secret.json
+oauthToken.json
 *.pem
 *.key
 *.crt
