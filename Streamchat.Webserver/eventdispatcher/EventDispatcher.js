@@ -1,33 +1,61 @@
+const fs = require('fs');
+const https = require('https');
 const WebSocket = require('ws');
 
 class EventDispatcher {
-  constructor(port = 8081) {
+  constructor(securePort = 8443, insecurePort = 8081) {
     this.clients = new Set();
     this.pendingAcks = new Map(); // <- Guarda intervalos por eventId
 
-    this.wss = new WebSocket.Server({ port });
+    // WSS server (puerto 8443)
+    const wssOptions = {
+      cert: fs.readFileSync('./unterstadistycs.sytes.net-chain.pem'),
+      key: fs.readFileSync('./unterstadistycs.sytes.net-key.pem')
+    };
 
-    this.wss.on('connection', (ws) => {
-      this.clients.add(ws);
+    const httpsWssServer = https.createServer(wssOptions);
+    this.wssSecure = new WebSocket.Server({ server: httpsWssServer });
 
-      ws.on('close', () => {
-        this.clients.delete(ws);
-      });
+    httpsWssServer.listen(securePort, () => {
+      console.log(`✅ WSS server escuchando en puerto ${securePort}`);
+    });
 
-      ws.on('message', (msg) => {
-        try {
-          const parsed = JSON.parse(msg);
-          if (parsed.type === 'ack') {
-            const interval = this.pendingAcks.get(parsed.eventId);
-            if (interval) {
-              clearInterval(interval);
-              this.pendingAcks.delete(parsed.eventId);
-            }
+    this.wssSecure.on('connection', (ws) => {
+      this.handleConnection(ws);
+    });
+
+    // WS server (puerto 8081)
+    this.wssInsecure = new WebSocket.Server({ port: insecurePort });
+
+    this.wssInsecure.on('listening', () => {
+      console.log(`✅ WS server escuchando en puerto ${insecurePort}`);
+    });
+
+    this.wssInsecure.on('connection', (ws) => {
+      this.handleConnection(ws);
+    });
+  }
+
+  handleConnection(ws) {
+    this.clients.add(ws);
+
+    ws.on('close', () => {
+      this.clients.delete(ws);
+    });
+
+    ws.on('message', (msg) => {
+      try {
+        const parsed = JSON.parse(msg);
+        if (parsed.type === 'ack') {
+          const interval = this.pendingAcks.get(parsed.eventId);
+          if (interval) {
+            clearInterval(interval);
+            this.pendingAcks.delete(parsed.eventId);
           }
-        } catch (err) {
-          console.error('❌ Error al parsear mensaje recibido del cliente:', err.message);
         }
-      });
+      } catch (err) {
+        console.error('❌ Error al parsear mensaje recibido del cliente:', err.message);
+      }
     });
   }
 
