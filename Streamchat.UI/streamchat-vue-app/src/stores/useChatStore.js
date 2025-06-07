@@ -1,6 +1,15 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
 
+const WS_PROTOCOL = window.location.protocol === 'https:' ? 'wss' : 'ws';
+const WS_HOST = window.location.hostname;
+const WS_PORT = WS_PROTOCOL === 'wss' ? '8443' : '8081';
+const WS_BASE_URL = `${WS_PROTOCOL}://${WS_HOST}:${WS_PORT}`;
+
+// Base URL para HTTP/HTTPS API:
+const API_PROTOCOL = window.location.protocol;
+const API_BASE_URL = `${API_PROTOCOL}//${WS_HOST}`;
+
 export const useChatStore = defineStore('chat', {
     state: () => ({
         ws: null,
@@ -17,10 +26,7 @@ export const useChatStore = defineStore('chat', {
                 return;
             }
 
-            const isLocal = window.location.hostname.startsWith('192.168.') || window.location.hostname === 'localhost';
-            const baseURL = isLocal ? 'ws://192.168.2.50:8081' : 'wss://unterstadistycs.sytes.net:8081';
-
-            this.ws = new WebSocket(baseURL);
+            this.ws = new WebSocket(WS_BASE_URL);
 
             this.ws.onopen = () => {
                 console.log('🟢 Conectado al WebSocket');
@@ -69,7 +75,7 @@ export const useChatStore = defineStore('chat', {
 
         async fetchLatestEvents() {
             try {
-                const response = await axios.get('http://localhost/api/latest-events');
+                const response = await axios.get(`${API_BASE_URL}/api/latest-events`);
                 this.events = response.data;
             } catch (error) {
                 console.error('Error al obtener eventos:', error);
@@ -78,7 +84,7 @@ export const useChatStore = defineStore('chat', {
 
         async fetchLatestMessages(){
             try {
-                const response = await axios.get('http://localhost/api/latest-messages');
+                const response = await axios.get(`${API_BASE_URL}/api/latest-messages`);
                 this.messages = response.data;
             } catch (error) {
                 console.error('Error trying to get messages:', error);
